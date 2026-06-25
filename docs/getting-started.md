@@ -39,19 +39,19 @@ plugins {
 
 !!! note "Kotlin DSL imports"
     The Kotlin DSL types live under `com.seanproctor.potassium.*` (for example
-    `import com.seanproctor.potassium.desktop.application.dsl.TargetFormat`).
+    `import com.seanproctor.potassium.dsl.MacOSTargetFormat`).
 
 ## Minimal Configuration
 
 ```kotlin
-potassium.application {
+potassium {
     mainClass = "com.example.MainKt"
+    packageName = "MyApp"
+    packageVersion = "1.0.0"
 
-    nativeDistributions {
-        targetFormats(TargetFormat.Dmg, TargetFormat.Nsis, TargetFormat.Deb)
-        packageName = "MyApp"
-        packageVersion = "1.0.0"
-    }
+    macOS { targetFormats(MacOSTargetFormat.Dmg) }
+    windows { targetFormats(WindowsTargetFormat.Nsis) }
+    linux { targetFormats(LinuxTargetFormat.Deb) }
 }
 ```
 
@@ -68,7 +68,7 @@ potassium.application {
 
 Potassium is fully compatible with [Compose Hot Reload](https://kotlinlang.org/docs/multiplatform/compose-hot-reload.html). Since Potassium extends the Compose plugin (not replaces it), Hot Reload works out of the box.
 
-The `hotRun` task reads `mainClass` from the `compose.desktop.application` block. If you only set it in `potassium.application`, add a minimal Compose block:
+The `hotRun` task reads `mainClass` from the `compose.desktop.application` block. If you only set it in `potassium`, add a minimal Compose block:
 
 ```kotlin
 compose.desktop.application {
@@ -87,7 +87,8 @@ Or pass it via the command line:
 | Task | Description |
 |------|-------------|
 | `packageDistributionForCurrentOS` | Build all configured formats for the current OS |
-| `package<Format>` | Build a specific format (e.g., `packageDmg`, `packageNsis`, `packageDeb`) |
+| `package<OS>` | Build all the current OS's non-store formats in one invocation (`packageMacOS` / `packageWindows` / `packageLinux`) |
+| `packagePkg` / `packageAppX` / `packageFlatpak` | Build a store format (each built separately) |
 | `packageReleaseDistributionForCurrentOS` | Same as above with ProGuard release build |
 | `createDistributable` | Create the application image without an installer |
 | `createReleaseDistributable` | Same with ProGuard |
@@ -102,16 +103,16 @@ Or pass it via the command line:
 ### Running a Specific Task
 
 ```bash
-# Build a DMG on macOS
-./gradlew packageDmg
+# Build all configured macOS formats (e.g. DMG + ZIP) in one invocation
+./gradlew packageMacOS
 
-# Build NSIS installer on Windows
-./gradlew packageNsis
+# Build all configured Windows formats (e.g. NSIS + MSI) in one invocation
+./gradlew packageWindows
 
-# Build DEB package on Linux
-./gradlew packageDeb
+# Build all configured Linux formats (e.g. DEB + RPM + AppImage) in one invocation
+./gradlew packageLinux
 
-# Build all formats for current OS
+# Build all formats for current OS (incl. store formats)
 ./gradlew packageDistributionForCurrentOS
 
 # Release build (with ProGuard)
@@ -123,14 +124,14 @@ Or pass it via the command line:
 Build artifacts are generated in:
 
 ```
-build/compose/binaries/main/<format>/
-build/compose/binaries/main-release/<format>/   # Release builds
+build/potassium/binaries/main/<format>/
+build/potassium/binaries/main-release/<format>/   # Release builds
 ```
 
 Override with:
 
 ```kotlin
-nativeDistributions {
+potassium {
     outputBaseDir.set(project.layout.buildDirectory.dir("custom-output"))
 }
 ```
@@ -146,7 +147,7 @@ The plugin does not automatically detect required JDK modules. Use `suggestModul
 Then declare them in the DSL:
 
 ```kotlin
-nativeDistributions {
+potassium {
     modules("java.sql", "java.net.http", "jdk.accessibility")
 }
 ```
@@ -154,7 +155,7 @@ nativeDistributions {
 Or include everything (larger binary):
 
 ```kotlin
-nativeDistributions {
+potassium {
     includeAllModules = true
 }
 ```
@@ -164,7 +165,7 @@ nativeDistributions {
 Provide platform-specific icon files:
 
 ```kotlin
-nativeDistributions {
+potassium {
     macOS {
         iconFile.set(project.file("icons/app.icns"))
     }
@@ -188,7 +189,7 @@ nativeDistributions {
 Include extra files in the installation directory via `appResourcesRootDir`:
 
 ```kotlin
-nativeDistributions {
+potassium {
     appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
 }
 ```

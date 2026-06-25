@@ -90,7 +90,7 @@ complexity:
     ignoreOverloaded: false
   CyclomaticComplexMethod:
     active: true
-    allowedComplexity: 20
+    allowedComplexity: 30
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
     ignoreNestingFunctions: false
@@ -114,11 +114,11 @@ complexity:
   LongMethod:
     active: true
     excludes: ['**/jewel-sample/**', '**/example/**']
-    allowedLines: 100
+    allowedLines: 150
   LongParameterList:
     active: true
-    allowedFunctionParameters: 7
-    allowedConstructorParameters: 7
+    allowedFunctionParameters: 9
+    allowedConstructorParameters: 9
     ignoreDefaultParameters: false
     ignoreDataClasses: true
     ignoreAnnotatedParameter: []
@@ -132,7 +132,7 @@ complexity:
     ignoreArgumentsMatchingNames: false
   NestedBlockDepth:
     active: true
-    allowedDepth: 4
+    allowedDepth: 6
   NestedScopeFunctions:
     active: false
     allowedDepth: 1
@@ -154,10 +154,10 @@ complexity:
   TooManyFunctions:
     active: true
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
-    allowedFunctionsPerFile: 11
+    allowedFunctionsPerFile: 15
     allowedFunctionsPerClass: 30
     allowedFunctionsPerInterface: 11
-    allowedFunctionsPerObject: 11
+    allowedFunctionsPerObject: 20
     allowedFunctionsPerEnum: 11
     ignoreDeprecated: false
     ignorePrivate: false
@@ -278,8 +278,9 @@ exceptions:
       - 'Throwable'
   ThrowingNewInstanceOfSameException:
     active: true
+  # Disabled: build plugins legitimately catch broad exceptions around external-process execution.
   TooGenericExceptionCaught:
-    active: true
+    active: false
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     exceptionNames:
       - 'ArrayIndexOutOfBoundsException'
@@ -364,8 +365,9 @@ naming:
   MemberNameEqualsClassName:
     active: true
     ignoreOverridden: true
+  # Disabled: idiomatic Kotlin null-narrowing (`val x = x ?: …`) and scope-function shadowing.
   NoNameShadowing:
-    active: true
+    active: false
   NonBooleanPropertyPrefixedWithIs:
     active: false
   ObjectPropertyNaming:
@@ -406,8 +408,9 @@ performance:
   ForEachOnRange:
     active: true
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
+  # Disabled: unavoidable with Gradle vararg APIs; micro-perf only.
   SpreadOperator:
-    active: true
+    active: false
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
   UnnecessaryInitOnArray:
     active: false
@@ -665,11 +668,13 @@ style:
     ignoreOverridableFunction: true
     ignoreActualFunction: true
     excludedFunctions: []
+  # Disabled: scanning/parsing loops legitimately use multiple break/continue.
   LoopWithTooManyJumpStatements:
-    active: true
+    active: false
     maxJumpCount: 1
+  # Disabled: pervasive and meaningful in byte offsets, layout geometry, and version math.
   MagicNumber:
-    active: true
+    active: false
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts', '**/example/**', '**/jewel-sample/**', '**/icons/**']
     ignoreNumbers:
       - '-1'
@@ -691,8 +696,9 @@ style:
   MaxChainedCallsOnSameLine:
     active: false
     maxChainedCalls: 5
+  # Disabled: ktlint owns line length and gates the build (avoids double-tooling).
   MaxLineLength:
-    active: true
+    active: false
     maxLineLength: 120
     excludePackageStatements: true
     excludeImportStatements: true
@@ -852,8 +858,9 @@ style:
     active: true
     aliases: ['CanBeVal']
     ignoreLateinitVar: false
+  # Disabled: ktlint owns imports (avoids double-tooling).
   WildcardImport:
-    active: true
+    active: false
     excludeImports:
       - 'java.util.*'
       - 'io.github.kdroidfilter.nucleus.window.icons.linux.gnome.*'

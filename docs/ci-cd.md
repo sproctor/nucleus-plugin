@@ -189,24 +189,24 @@ jobs:
         with:
           name: release-assets-${{ runner.os }}-${{ matrix.arch }}
           path: |
-            build/compose/binaries/**/*.dmg
-            build/compose/binaries/**/*.pkg
-            build/compose/binaries/**/*.exe
-            build/compose/binaries/**/*.msi
-            build/compose/binaries/**/*.appx
-            build/compose/binaries/**/*.deb
-            build/compose/binaries/**/*.rpm
-            build/compose/binaries/**/*.AppImage
-            build/compose/binaries/**/*.snap
-            build/compose/binaries/**/*.flatpak
-            build/compose/binaries/**/*.zip
-            build/compose/binaries/**/*.tar
-            build/compose/binaries/**/*.7z
-            build/compose/binaries/**/*.blockmap
-            build/compose/binaries/**/signing-metadata.json
-            build/compose/binaries/**/packaging-metadata.json
-            !build/compose/binaries/**/app/**
-            !build/compose/binaries/**/runtime/**
+            build/potassium/binaries/**/*.dmg
+            build/potassium/binaries/**/*.pkg
+            build/potassium/binaries/**/*.exe
+            build/potassium/binaries/**/*.msi
+            build/potassium/binaries/**/*.appx
+            build/potassium/binaries/**/*.deb
+            build/potassium/binaries/**/*.rpm
+            build/potassium/binaries/**/*.AppImage
+            build/potassium/binaries/**/*.snap
+            build/potassium/binaries/**/*.flatpak
+            build/potassium/binaries/**/*.zip
+            build/potassium/binaries/**/*.tar
+            build/potassium/binaries/**/*.7z
+            build/potassium/binaries/**/*.blockmap
+            build/potassium/binaries/**/signing-metadata.json
+            build/potassium/binaries/**/packaging-metadata.json
+            !build/potassium/binaries/**/app/**
+            !build/potassium/binaries/**/runtime/**
           if-no-files-found: error
 ```
 
@@ -241,10 +241,8 @@ val releaseVersion = System.getenv("RELEASE_VERSION")
     ?.takeIf { it.isNotBlank() }
     ?: "1.0.0"
 
-potassium.application {
-    nativeDistributions {
-        packageVersion = releaseVersion
-    }
+potassium {
+    packageVersion = releaseVersion
 }
 ```
 
@@ -531,20 +529,20 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" = "Linux" ]; then
-            xvfb-run ./gradlew :myapp:packageGraalvmDeb \
+            xvfb-run ./gradlew :myapp:packageGraalvmLinux \
               -PnativeMarch=compatibility --no-daemon
           elif [ "$RUNNER_OS" = "macOS" ]; then
-            ./gradlew :myapp:packageGraalvmDmg \
+            ./gradlew :myapp:packageGraalvmMacOS \
               -PnativeMarch=compatibility --no-daemon
           elif [ "$RUNNER_OS" = "Windows" ]; then
-            ./gradlew :myapp:packageGraalvmNsis \
+            ./gradlew :myapp:packageGraalvmWindows \
               -PnativeMarch=compatibility --no-daemon
           fi
 
       - uses: actions/upload-artifact@v4
         with:
           name: graalvm-${{ runner.os }}-${{ matrix.arch }}
-          path: myapp/build/compose/binaries/**/graalvm-*/**
+          path: myapp/build/potassium/binaries/**/graalvm-*/**
           if-no-files-found: error
 ```
 
@@ -552,9 +550,9 @@ jobs:
 
 | Task | Format | Platform |
 |------|--------|----------|
-| `packageGraalvmDeb` | `.deb` | Linux |
-| `packageGraalvmDmg` | `.dmg` | macOS |
-| `packageGraalvmNsis` | `.exe` (NSIS installer) | Windows |
+| `packageGraalvmLinux` | `.deb` | Linux |
+| `packageGraalvmMacOS` | `.dmg` | macOS |
+| `packageGraalvmWindows` | `.exe` (NSIS installer) | Windows |
 | `packageGraalvmNative` | Raw binary + libraries | All (no installer) |
 
 These tasks first compile the native image via `packageGraalvmNative`, then package it using electron-builder into the target format. Node.js is required (`setup-node: 'true'`).
