@@ -175,10 +175,10 @@ private fun mergeMembers(
  * Produces a comparable signature string for a method/field entry.
  */
 private fun memberSignature(obj: Map<String, Any?>): String {
-    val name = obj["name"] as? String ?: ""
+    val name = (obj["name"] as? String).orEmpty()
 
     @Suppress("UNCHECKED_CAST")
-    val params = (obj["parameterTypes"] as? List<String>)?.joinToString(",") ?: ""
+    val params = (obj["parameterTypes"] as? List<String>)?.joinToString(",").orEmpty()
     return "$name($params)"
 }
 
@@ -214,6 +214,7 @@ private fun mergeSimpleEntries(
  * A reflection/jni entry is removed only when the baseline is a **strict superset** —
  * all methods, fields, and flags in the project entry are present in the baseline.
  */
+@Suppress("CyclomaticComplexMethod", "NestedBlockDepth") // Known-complex dedup logic; candidate for future refactor.
 internal fun deduplicateAgainstLibraryMetadata(
     classpathFiles: Iterable<File>,
     targetDir: File,

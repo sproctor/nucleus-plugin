@@ -60,6 +60,7 @@ abstract class CleanupGraalvmMetadataTask : DefaultTask() {
     abstract val configDir: Property<File>
 
     @TaskAction
+    @Suppress("CyclomaticComplexMethod", "LongMethod", "NestedBlockDepth") // Known-complex GraalVM metadata cleanup; candidate for future refactor.
     fun cleanup() {
         val targetDir = configDir.get()
         val targetFile = File(targetDir, "reachability-metadata.json")
@@ -445,10 +446,10 @@ abstract class CleanupGraalvmMetadataTask : DefaultTask() {
     }
 
     private fun sig(obj: Map<String, Any?>): String {
-        val name = obj["name"] as? String ?: ""
+        val name = (obj["name"] as? String).orEmpty()
 
         @Suppress("UNCHECKED_CAST")
-        val params = (obj["parameterTypes"] as? List<String>)?.joinToString(",") ?: ""
+        val params = (obj["parameterTypes"] as? List<String>)?.joinToString(",").orEmpty()
         return "$name($params)"
     }
 

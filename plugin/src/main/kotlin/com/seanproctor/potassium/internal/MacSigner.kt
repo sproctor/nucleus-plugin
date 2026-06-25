@@ -90,7 +90,7 @@ internal class MacSignerImpl(
                         ),
                     processStdout = { signKeyValue = matchCertificates(it) },
                 )
-                signKeyValue!!
+                checkNotNull(signKeyValue)
             }
         runTool.unsign(file)
         runTool.sign(

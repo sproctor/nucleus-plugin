@@ -92,7 +92,7 @@ abstract class AbstractNotarizationTask
 
             if (submissionId != null) {
                 logger.lifecycle("Notarization submission ID: $submissionId (file: ${packageFile.name})")
-                saveNotarizationRequestInfo(submissionId!!)
+                saveNotarizationRequestInfo(checkNotNull(submissionId))
             }
 
             if (result.exitValue != 0 || stdout.contains("status: Invalid")) {

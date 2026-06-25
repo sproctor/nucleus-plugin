@@ -4,6 +4,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import java.io.File
+import java.util.Locale
 
 /**
  * Real-world integration test: runs the static bytecode analyzer on the Zayit (SeforimApp)
@@ -50,7 +51,7 @@ class ZayitAnalyzerTest {
         println("=".repeat(110))
 
         val header = "%-55s | %5s | %5s | %5s | %5s | %5s"
-        println(header.format("JAR", "JNI", "Refl", "SvcLd", "Res", "CfN"))
+        println(header.format(Locale.ROOT, "JAR", "JNI", "Refl", "SvcLd", "Res", "CfN"))
         println("-".repeat(110))
 
         var totalJni = 0
@@ -74,12 +75,12 @@ class ZayitAnalyzerTest {
             totalCfn += cfn
 
             if (jni + refl + svc + res > 0) {
-                println(header.format(jar.name.take(55), jni, refl, svc, res, cfn))
+                println(header.format(Locale.ROOT, jar.name.take(55), jni, refl, svc, res, cfn))
             }
         }
 
         println("-".repeat(110))
-        println(header.format("TOTAL", totalJni, totalRefl, totalSvc, totalRes, totalCfn))
+        println(header.format(Locale.ROOT, "TOTAL", totalJni, totalRefl, totalSvc, totalRes, totalCfn))
         println("=".repeat(110))
     }
 

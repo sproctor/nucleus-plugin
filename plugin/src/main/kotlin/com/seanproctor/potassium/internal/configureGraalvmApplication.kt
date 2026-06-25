@@ -71,7 +71,6 @@ internal fun JvmApplicationContext.configureGraalvmApplication() {
 
     val agentTempDir = appTmpDir.map { it.dir("graalvm/agentOutput") }
 
-    val runWithNativeAgent =
         tasks.register<JavaExec>(
             taskNameAction = "run",
             taskNameObject = "withNativeAgent",
@@ -254,7 +253,7 @@ internal fun JvmApplicationContext.configureGraalvmApplication() {
             // Project/SourceSet references into the configuration cache.
             val winPkgName = packageNameProvider
             val winPkgVersion = provider { app.nativeDistributions.packageVersion ?: "1.0.0" }
-            val winCopyright = provider { app.nativeDistributions.copyright ?: "" }
+            val winCopyright = provider { app.nativeDistributions.copyright.orEmpty() }
             val winDescription = provider { app.nativeDistributions.description ?: packageNameProvider.get() }
             val winIconFile =
                 app.nativeDistributions.windows.iconFile
@@ -392,7 +391,7 @@ internal fun JvmApplicationContext.configureGraalvmApplication() {
             taskNameObject = "graalvmPlatformMetadata",
         ) {
             description = "Generate platform-specific GraalVM metadata for AWT/Java2D and main class"
-            inputs.property("mainClass", mainClassName ?: "")
+            inputs.property("mainClass", mainClassName.orEmpty())
             outputs.dir(platformMetadataDir)
 
             doLast {
@@ -529,39 +528,37 @@ internal fun JvmApplicationContext.configureGraalvmApplication() {
         .register(
             "cleanupGraalvmMetadata",
             CleanupGraalvmMetadataTask::class.java,
-        ).apply {
-            configure { task ->
-                task.description =
-                    "Remove entries from manual reachability-metadata.json that are already managed by Potassium"
-                task.group = POTASSIUM_TASK_GROUP
-                task.dependsOn(resolveReachabilityMetadata)
-                task.dependsOn(analyzeStaticMetadata)
-                task.dependsOn(filterLibraryMetadata)
+        ).configure { task ->
+            task.description =
+                "Remove entries from manual reachability-metadata.json that are already managed by Potassium"
+            task.group = POTASSIUM_TASK_GROUP
+            task.dependsOn(resolveReachabilityMetadata)
+            task.dependsOn(analyzeStaticMetadata)
+            task.dependsOn(filterLibraryMetadata)
 
-                if (runtimeCfg != null) {
-                    task.runtimeClasspath.from(runtimeCfg)
-                }
-                task.metadataRepoDirsFile.set(project.layout.file(metadataRepoDirsFile.map { it.asFile }))
-                task.staticAnalysisDir.from(staticMetadataDir)
-                task.staticAnalysisDir.from(libraryMetadataDir)
-                task.platformName.set(
-                    when (currentOS) {
-                        OS.Windows -> "windows"
-                        OS.MacOS -> "macos"
-                        OS.Linux -> "linux"
-                    },
-                )
-                task.mainClass.set(mainClassName ?: "")
-                task.configDir.set(
-                    if (nativeImageConfigDir.isPresent) {
-                        nativeImageConfigDir.get().asFile
-                    } else {
-                        project.layout.projectDirectory
-                            .dir("graalvm")
-                            .asFile
-                    },
-                )
+            if (runtimeCfg != null) {
+                task.runtimeClasspath.from(runtimeCfg)
             }
+            task.metadataRepoDirsFile.set(project.layout.file(metadataRepoDirsFile.map { it.asFile }))
+            task.staticAnalysisDir.from(staticMetadataDir)
+            task.staticAnalysisDir.from(libraryMetadataDir)
+            task.platformName.set(
+                when (currentOS) {
+                    OS.Windows -> "windows"
+                    OS.MacOS -> "macos"
+                    OS.Linux -> "linux"
+                },
+            )
+            task.mainClass.set(mainClassName.orEmpty())
+            task.configDir.set(
+                if (nativeImageConfigDir.isPresent) {
+                    nativeImageConfigDir.get().asFile
+                } else {
+                    project.layout.projectDirectory
+                        .dir("graalvm")
+                        .asFile
+                },
+            )
         }
 
     // ── nativeImageCompile ──
@@ -788,7 +785,7 @@ internal fun JvmApplicationContext.configureGraalvmApplication() {
 // macOS packaging
 // ═══════════════════════════════════════════════════════════════════
 
-@Suppress("LongMethod", "LongParameterList")
+@Suppress("LongMethod", "LongParameterList", "CyclomaticComplexMethod") // Inherent to macOS GraalVM packaging configuration.
 private fun JvmApplicationContext.configureMacOsGraalvmPackaging(
     graalvm: GraalvmSettings,
     graalvmHome: org.gradle.api.provider.Provider<String>,
@@ -945,7 +942,7 @@ private fun JvmApplicationContext.configureMacOsGraalvmPackaging(
                 // Patch all Mach-O files: main binary + dylibs in MacOS/ and MacOS/lib/
                 sequenceOf(macosDir, libDir)
                     .filter { it.isDirectory }
-                    .flatMap { dir -> dir.listFiles()?.asSequence() ?: emptySequence() }
+                    .flatMap { dir -> dir.listFiles()?.asSequence().orEmpty() }
                     .filter { it.isFile && (it.extension == "dylib" || it.canExecute()) }
                     .toList()
                     .also { files ->
@@ -1055,11 +1052,11 @@ private fun JvmApplicationContext.configureMacOsGraalvmPackaging(
 
             // Wire inputs for up-to-date checks
             inputs.property("bundleName", plistBundleName)
-            inputs.property("bundleID", plistBundleID ?: "")
+            inputs.property("bundleID", plistBundleID.orEmpty())
             inputs.property("version", plistVersion)
             inputs.property("imageName", imageName)
             inputs.property("minSystemVersion", plistMinSystemVersion)
-            inputs.property("copyright", plistCopyright ?: "")
+            inputs.property("copyright", plistCopyright.orEmpty())
             inputs.property("iconFileName", plistIconFileName)
             inputs.property("fileAssociations", plistFileAssociations.toString())
 

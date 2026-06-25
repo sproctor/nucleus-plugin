@@ -21,6 +21,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.security.MessageDigest
+import java.util.Locale
 
 private const val ALIAS_NAME_MAX_LENGTH = 32
 private const val ALIAS_HASH_LENGTH = 8
@@ -120,7 +121,7 @@ abstract class AbstractPatchCaCertificatesTask : AbstractPotassiumTask() {
             MessageDigest
                 .getInstance("SHA-256")
                 .digest(cert.readBytes())
-                .joinToString("") { "%02x".format(it) }
+                .joinToString("") { "%02x".format(Locale.ROOT, it) }
                 .take(ALIAS_HASH_LENGTH)
         return "$namePart-$hashPart"
     }

@@ -315,11 +315,12 @@ mavenPublishing {
     }
 }
 
-// Use Detekt with type resolution for check
+// Use Detekt with type resolution (detektMain/detektTest) for check, instead of the
+// non-type-resolution `detekt` task (several rules, e.g. ImplicitDefaultLocale, need types).
 tasks.named("check").configure {
     this.setDependsOn(
         this.dependsOn.filterNot {
             it is TaskProvider<*> && it.name == "detekt"
-        } + tasks.named("detektMain"),
+        } + tasks.named("detektMain") + tasks.named("detektTest"),
     )
 }

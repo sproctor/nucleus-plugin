@@ -45,7 +45,7 @@ internal data class Version(
             val major: Int = matchResult.groups[1]?.value?.toInt() ?: 0
             val minor: Int = matchResult.groups[2]?.value?.toInt() ?: 0
             val patch: Int = matchResult.groups[3]?.value?.toInt() ?: 0
-            val meta: String = matchResult.groups[4]?.value ?: ""
+            val meta: String = matchResult.groups[4]?.value.orEmpty()
             return Version(major, minor, patch, meta)
         }
     }

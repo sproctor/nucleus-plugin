@@ -48,7 +48,12 @@ internal fun File.contentHash(): String {
 private fun MessageDigest.digestContent(file: File) {
     file.inputStream().buffered().use { fis ->
         DigestInputStream(fis, this).use { ds ->
-            while (ds.read() != -1) {}
+            // Drain the stream so the digest consumes every byte; the read content is discarded.
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            var bytesRead = ds.read(buffer)
+            while (bytesRead != -1) {
+                bytesRead = ds.read(buffer)
+            }
         }
     }
 }

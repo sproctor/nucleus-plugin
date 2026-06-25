@@ -45,7 +45,7 @@ abstract class FilterLibraryMetadataTask : DefaultTask() {
                 ?.bufferedReader()
                 ?.readLines()
                 ?.filter { it.isNotBlank() }
-                ?: emptyList()
+                .orEmpty()
 
         val slurper = JsonSlurper()
         val mergedReflection = mutableListOf<Any?>()
@@ -104,6 +104,7 @@ abstract class FilterLibraryMetadataTask : DefaultTask() {
  * Scans classpath JARs and class directories to build a set of all Java package names present.
  * Only reads the ZIP central directory (fast) — no class file parsing.
  */
+@Suppress("NestedBlockDepth") // Inherent to classpath scanning.
 private fun buildClasspathPackageIndex(files: Set<File>): Set<String> {
     val packages = mutableSetOf<String>()
     for (file in files) {

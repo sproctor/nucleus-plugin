@@ -9,9 +9,9 @@ import com.seanproctor.potassium.internal.InfoPlistBuilder.InfoPlistValue.*
 import java.io.File
 import kotlin.reflect.KProperty
 
-private const val indent = "  "
+private const val INDENT = "  "
 
-private fun indentForLevel(level: Int) = indent.repeat(level)
+private fun indentForLevel(level: Int) = INDENT.repeat(level)
 
 internal class InfoPlistBuilder(
     private val extraPlistKeysRawXml: String? = null,

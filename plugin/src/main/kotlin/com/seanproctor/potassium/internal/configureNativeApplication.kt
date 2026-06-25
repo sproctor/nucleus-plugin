@@ -85,7 +85,6 @@ private fun configureNativeApplication(
         }
 
     if (MacOSTargetFormat.Dmg in app.distributions.targetFormats) {
-        val packageDmg =
             project.tasks.composeDesktopNativeTask<AbstractNativeMacApplicationPackageDmgTask>(
                 desktopNativeTaskName("packageDmgNative", binary),
             ) {

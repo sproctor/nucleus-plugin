@@ -153,6 +153,8 @@ abstract class PotassiumExtension
 
         // targetFormats are configured per-OS inside the macOS { } / windows { } / linux { } blocks.
 
+        // Mutable property with a real getter/setter delegating to distributions; cannot be `val`.
+        @Suppress("DoubleMutabilityForCollection")
         var modules: ArrayList<String>
             get() = distributions.modules
             set(value) {

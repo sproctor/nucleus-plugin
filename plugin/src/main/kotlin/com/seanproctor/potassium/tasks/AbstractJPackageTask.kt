@@ -316,7 +316,7 @@ abstract class AbstractJPackageTask
             if (currentOS == OS.MacOS) {
                 if (shouldSign) {
                     val validatedSettings =
-                        nonValidatedSettings!!.validate(nonValidatedMacBundleID, project, macAppStore)
+                        checkNotNull(nonValidatedSettings).validate(nonValidatedMacBundleID, project, macAppStore)
                     MacSignerImpl(validatedSettings, runExternalTool)
                 } else {
                     NoCertificateSigner(runExternalTool)
@@ -476,7 +476,7 @@ abstract class AbstractJPackageTask
             if (currentOS == OS.MacOS) {
                 val tmpDirForSign = signDir.ioFile
                 fileOperations.clearDirs(tmpDirForSign)
-                MacJarSignFileCopyingProcessor(macSigner!!, tmpDirForSign, jvmRuntimeInfo.majorVersion)
+                MacJarSignFileCopyingProcessor(checkNotNull(macSigner), tmpDirForSign, jvmRuntimeInfo.majorVersion)
             } else {
                 SimpleFileCopyingProcessor
             }
@@ -615,7 +615,7 @@ abstract class AbstractJPackageTask
             val appEntitlementsFile = macEntitlementsFile.ioFileOrNull
             val runtimeEntitlementsFile = macRuntimeEntitlementsFile.ioFileOrNull
 
-            val macSigner = macSigner!!
+            val macSigner = checkNotNull(macSigner)
             // Resign the runtime completely (and also the app dir only)
             // Sign all libs and executables in runtime
             runtimeDir.walk().forEach { file ->
@@ -827,6 +827,12 @@ abstract class AbstractJPackageTask
 // Serializable is only needed to avoid breaking configuration cache:
 // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:requirements
 private class FilesMapping : Serializable {
+    private companion object {
+        private const val serialVersionUID: Long = 1L
+    }
+
+    // Reassigned in readObject during deserialization; cannot be `val`.
+    @Suppress("DoubleMutabilityForCollection")
     private var mapping = HashMap<File, List<File>>()
 
     operator fun get(key: File): List<File>? = mapping[key]

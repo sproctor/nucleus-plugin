@@ -91,10 +91,10 @@ internal object MethodHandleDetector {
                             when (opcode) {
                                 Opcodes.ASTORE -> {
                                     if (lastClassType != null) {
-                                        localClassTypes[varIndex] = lastClassType!!
+                                        localClassTypes[varIndex] = checkNotNull(lastClassType)
                                     }
                                     if (lastStringConstant != null) {
-                                        localStrings[varIndex] = lastStringConstant!!
+                                        localStrings[varIndex] = checkNotNull(lastStringConstant)
                                     }
                                     lastClassType = null
                                     lastStringConstant = null

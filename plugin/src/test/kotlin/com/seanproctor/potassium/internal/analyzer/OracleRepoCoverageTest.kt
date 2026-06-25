@@ -5,6 +5,7 @@ import org.junit.Assert.fail
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import java.io.File
+import java.util.Locale
 import java.util.zip.ZipFile
 
 /**
@@ -61,7 +62,7 @@ class OracleRepoCoverageTest {
                             dir.listFiles()?.any {
                                 it.name.endsWith("-config.json") || it.name == "reachability-metadata.json"
                             } == true
-                        } ?: emptyList()
+                        }.orEmpty()
 
                 if (versionDirs.isNotEmpty()) {
                     result[key] = OracleLibraryMeta(group, artifact, versionDirs)
@@ -230,6 +231,7 @@ class OracleRepoCoverageTest {
         val header = "%-50s | %5s | %5s | %5s | %5s | %5s | %5s | %5s | %5s | %5s | %5s | %5s | %5s"
         println(
             header.format(
+                Locale.ROOT,
                 "Library",
                 "OraRf",
                 "DetRf",
@@ -252,6 +254,7 @@ class OracleRepoCoverageTest {
             val refPct = if (r.oraRef == 0) "N/A" else "${(r.detRef + r.parRef) * 100 / r.oraRef}%"
             println(
                 header.format(
+                    Locale.ROOT,
                     r.key.take(50),
                     r.oraRef,
                     r.detRef,
@@ -286,6 +289,7 @@ class OracleRepoCoverageTest {
 
         println(
             header.format(
+                Locale.ROOT,
                 "TOTAL",
                 tOraRef,
                 tDetRef,

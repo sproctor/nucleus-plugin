@@ -503,7 +503,6 @@ private fun JvmApplicationContext.configurePackagingTasks(commonTasks: CommonJvm
             configureFlattenJars(this, runProguard)
         }
 
-    val packageUberJarForCurrentOS =
         tasks.register<Jar>(
             taskNameAction = "package",
             taskNameObject = "uberJarForCurrentOS",
@@ -559,13 +558,12 @@ private fun JvmApplicationContext.configurePackagingTasks(commonTasks: CommonJvm
             registerPatchMacJvmTask(
                 javaHome = app.javaHome,
                 minVersion = app.nativeDistributions.macOS.minimumSystemVersion ?: "10.13",
-                sdkVersion = app.nativeDistributions.macOS.macOsSdkVersion!!,
+                sdkVersion = checkNotNull(app.nativeDistributions.macOS.macOsSdkVersion),
             )
         } else {
             null
         }
 
-    val run =
         tasks.register<JavaExec>(taskNameAction = "run") {
             configureRunTask(this, commonTasks.prepareAppResources, runProguard, patchMacJvmTask)
         }
@@ -760,7 +758,7 @@ private fun JvmApplicationContext.configurePackageTask(
         provider {
             val appIdArg = "-D$APP_ID=${resolvedAppIdProvider().get()}"
             val appVersionArgs =
-                resolvedAppVersion()?.let { listOf("-D$APP_VERSION=$it") } ?: emptyList()
+                resolvedAppVersion()?.let { listOf("-D$APP_VERSION=$it") }.orEmpty()
             var args = defaultJvmArgs + appIdArg + appVersionArgs + app.jvmArgs
             val splash = app.nativeDistributions.splashImage
             if (splash != null) {

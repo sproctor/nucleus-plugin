@@ -116,7 +116,7 @@ class UpdateYmlMergerTest {
             UpdateYmlMerger.merge(emptyList())
             fail("Expected merge(emptyList()) to throw")
         } catch (e: IllegalArgumentException) {
-            assertTrue(true)
+            assertTrue("Expected an IllegalArgumentException message but was: ${e.message}", e.message != null)
         }
     }
 }

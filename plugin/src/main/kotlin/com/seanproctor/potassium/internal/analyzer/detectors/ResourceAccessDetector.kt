@@ -76,7 +76,7 @@ internal object ResourceAccessDetector {
                                 name in RESOURCE_METHODS &&
                                 stackString != null
                             ) {
-                                val path = normalizeResourcePath(stackString!!)
+                                val path = normalizeResourcePath(checkNotNull(stackString))
                                 if (path.isNotEmpty()) {
                                     patterns.add(ResourcePattern(glob = path))
                                 }

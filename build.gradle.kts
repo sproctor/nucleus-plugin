@@ -46,7 +46,6 @@ allprojects {
 
     detekt {
         config.setFrom(rootProject.files("config/detekt/detekt.yml"))
-        ignoreFailures = true
     }
 }
 
